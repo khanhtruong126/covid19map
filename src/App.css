@@ -1,0 +1,25 @@
+ul{
+  list-style-type: none;
+}
+
+.patient-list{
+  overflow-y: scroll;
+  max-height: 655px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.patient-list-item{
+  cursor: pointer;
+}
+
+.list-group-item:hover{
+  background-color:	#F5F5F5;
+}
+
+.clickedListItem{
+  background-color:	#C0C0C0;
+}
+
+#dateSeekBar{
+  margin-top: 20px;
+}
