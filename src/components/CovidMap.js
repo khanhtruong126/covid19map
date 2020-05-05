@@ -3,7 +3,6 @@ import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 
 const CovidMap = (props) => {
     const curDate = new Date(props.currentDate);
-
     const filterPatientsList = props.patientsLst.filter(patient => new Date(patient.verifyDate) < curDate);
 
     return <Map center={props.currentPatient ? [props.currentPatient.lat, props.currentPatient.lng] : [10.762887, 106.6800684]} zoom={12}>

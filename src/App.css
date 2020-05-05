@@ -4,7 +4,7 @@ ul{
 
 .patient-list{
   overflow-y: scroll;
-  max-height: 655px;
+  max-height: 605px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -22,4 +22,21 @@ ul{
 
 #dateSeekBar{
   margin-top: 20px;
+}
+
+a {
+  color: #212529;
+}
+
+.navbar-brand{
+  font-weight: 500;
+}
+
+span.MuiSlider-rail, span.MuiSlider-track {
+  height: 5px !important;
+}
+
+#dateSeekBar span.MuiSlider-thumb.MuiSlider-thumbColorPrimary{
+  height: 15px !important;
+  width: 15px !important;
 }

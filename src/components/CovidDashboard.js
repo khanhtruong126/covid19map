@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
@@ -11,9 +11,36 @@ import $ from 'jquery';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 
-const CovidDashboard = (props) => {
-    const [patientsLst, setPatientsLst] = useState([]);
-    useEffect(() => {
+class CovidDashboard extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            patienstLst: [],
+            currentPatient: null,
+            currentDate: 0, //current date sent by seekbar
+            seekbarControllerValue: 1575738000000,// to control value of seekbar starting at December 08, 2019 (date -> milliseconds)
+            isPlaying: false,
+        };
+    }
+
+    componentDidMount() {
+        this.getAllPatients();
+
+        const _this = this;
+        setInterval(() => {
+            if (_this.state.isPlaying === true && this.state.seekbarControllerValue < Date.now()) {
+                _this.updateSeekbarDate(86400000); //milisec of a day
+            }
+            if (_this.state.isPlaying === true && this.state.seekbarControllerValue >= Date.now()) {
+                this.setState({
+                    seekbarControllerValue: 1575738000000
+                });
+            }
+        }, 500);
+    }
+
+    getAllPatients = () => {
         fetch("https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
             .then(res => res.json())
             .then(
@@ -28,27 +55,31 @@ const CovidDashboard = (props) => {
                     finishSorting = true;
 
                     if (finishSorting) {
-                        setPatientsLst(result.data);
+                        this.setState({
+                            patienstLst: result.data
+                        });
                     }
                 },
                 (error) => {
                     console.log(error)
                 }
             )
-    }, []);
-
-    const [currentPatient, setCurrentPatient] = useState();
-    const patientMarkerClickedHandler = (patient) => {
-        setCurrentPatient(patient);
     }
 
-    const [currentDate, setCurrentDate] = useState();
-    const setDate = (date) => {
-        console.log(date)
-        setCurrentDate(date);
+    patientMarkerClickedHandler = (patient) => {
+        this.setState({
+            currentPatient: patient
+        });
     }
 
-    const onMarkerClick = (id) => {
+    updateSeekbarDate = (dayTime) => {
+        const newTime = this.state.seekbarControllerValue + dayTime;
+        this.setState({
+            seekbarControllerValue: newTime
+        });
+    }
+
+    onMarkerClick(id) {
         $('div.clickedListItem').removeClass('clickedListItem');
         let elmnt = document.getElementById("patientItem" + id);
         elmnt.className += ' clickedListItem';
@@ -56,60 +87,68 @@ const CovidDashboard = (props) => {
             //behavior: 'smooth',
             block: 'center',
         });
-
     }
 
-    const [dateValue, setDateValue] = useState({
-        dateValue: 0,
-        setValue: (newValue) => {
-            setDateValue({...dateValue, dateValue: newValue})
+    getCurrentDateFromSeekbar = (dateValue) => {  
+        this.setState({
+            currentDate: dateValue
+        });             
+    }
+
+    playTimeline = () => {
+        if (this.state.isPlaying === true) {
+            return;
         }
-    });
-    
-    const updateDate = (value) => {
-        setDateValue(value);
+        this.setState({
+            isPlaying: true
+        });
     }
 
-    const playTimeline = () =>{
-        let start = Date.parse("December 08, 2019");
-        setInterval(() => {
-            updateDate(start);
-            start+= 86400000;
-        }, 500);
+    stopTimeline = () => {
+        if (this.state.isPlaying === false) {
+            return;
+        }
+        this.setState({
+            isPlaying: false
+        });
     }
 
-    const stopTimeline = () =>{
-        
-    }
-    
-    return <div style={{ padding: "30px" }}>
-        <Row>
-            <Col xs={6}>
-                <CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} onMarkerClick={onMarkerClick}
-                    patientsLst={patientsLst} currentPatient={currentPatient} currentDate={currentDate}/>
-                <div id="dateSeekBar">
-                <Button onClick={playTimeline}><PlayArrowIcon></PlayArrowIcon></Button>
-                <Button onClick={stopTimeline}><PauseIcon></PauseIcon></Button>
-                {dateValue && patientsLst &&
-                    <DateSeekbar dateValue={dateValue} patientsLst={patientsLst} emitDate={setDate}/>
-                }
+    render() {
+        const patientsLst = this.state.patienstLst;
+        const currentPatient = this.state.currentPatient;
+        const currentDate = this.state.currentDate;
+        const seekbarControllerValue = this.state.seekbarControllerValue;
 
-                </div>
-            </Col>
-            <Col xs={3}> Patient Information:
+        const utcTime = new Date(seekbarControllerValue);
+        const utcString = utcTime.toDateString();
+        return (
+            <div style={{ padding: "30px" }}>
+                <Row>
+                    <Col xs={6}>
+                        <CovidMap onPatientMarkerClicked={this.patientMarkerClickedHandler} onMarkerClick={this.onMarkerClick}
+                            patientsLst={patientsLst} currentPatient={currentPatient} currentDate={currentDate} />
+                        <div id="dateSeekBar">
+                            <Button onClick={() => this.playTimeline()}><PlayArrowIcon></PlayArrowIcon></Button>
+                            <Button onClick={() => this.stopTimeline()}><PauseIcon></PauseIcon></Button>
+                            <DateSeekbar dateValue={seekbarControllerValue} emitDate={this.getCurrentDateFromSeekbar} />
+                            <div style={{display: 'flex', justifyContent: 'center'}}>{utcString}</div>
+                        </div>
+                    </Col>
+                    <Col xs={3}> Patient Information:
                 {currentPatient &&
-                    <PatientInfo currentPatient={currentPatient} />
-                }
-            </Col>
-            <Col xs={3} >
-                <PatientList onPatientMarkerClicked={patientMarkerClickedHandler}
-                    onMarkerClick={onMarkerClick}
-                    patientsLst={patientsLst}>
-                </PatientList>
-            </Col>
-        </Row>
-    </div>
-};
-
+                            <PatientInfo currentPatient={currentPatient} />
+                        }
+                    </Col>
+                    <Col xs={3} >
+                        <PatientList onPatientMarkerClicked={this.patientMarkerClickedHandler}
+                            onMarkerClick={this.onMarkerClick}
+                            patientsLst={patientsLst}>
+                        </PatientList>
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
+}
 
 export default CovidDashboard;
