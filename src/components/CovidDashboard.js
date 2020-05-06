@@ -31,8 +31,7 @@ class CovidDashboard extends Component {
         setInterval(() => {
             if (_this.state.isPlaying === true && this.state.seekbarControllerValue < Date.now()) {
                 _this.updateSeekbarDate(86400000); //milisec of a day
-            }
-            if (_this.state.isPlaying === true && this.state.seekbarControllerValue >= Date.now()) {
+            } else if (_this.state.isPlaying === true && this.state.seekbarControllerValue >= Date.now()) {
                 this.setState({
                     seekbarControllerValue: 1575738000000
                 });
@@ -84,15 +83,15 @@ class CovidDashboard extends Component {
         let elmnt = document.getElementById("patientItem" + id);
         elmnt.className += ' clickedListItem';
         elmnt.scrollIntoView({
-            //behavior: 'smooth',
+            behavior: 'smooth',
             block: 'center',
         });
     }
 
-    getCurrentDateFromSeekbar = (dateValue) => {  
+    getCurrentDateFromSeekbar = (dateValue) => {
         this.setState({
             currentDate: dateValue
-        });             
+        });
     }
 
     playTimeline = () => {
@@ -121,21 +120,30 @@ class CovidDashboard extends Component {
 
         const utcTime = new Date(seekbarControllerValue);
         const utcString = utcTime.toDateString();
+
         return (
             <div style={{ padding: "30px" }}>
                 <Row>
                     <Col xs={6}>
                         <CovidMap onPatientMarkerClicked={this.patientMarkerClickedHandler} onMarkerClick={this.onMarkerClick}
                             patientsLst={patientsLst} currentPatient={currentPatient} currentDate={currentDate} />
-                        <div id="dateSeekBar">
-                            <Button onClick={() => this.playTimeline()}><PlayArrowIcon></PlayArrowIcon></Button>
-                            <Button onClick={() => this.stopTimeline()}><PauseIcon></PauseIcon></Button>
+                        <div className='row' id="dateSeekBar">
+                            {this.state.isPlaying === false &&
+                                <Button variant="secondary" onClick={() => this.playTimeline()}>
+                                    <PlayArrowIcon></PlayArrowIcon>
+                                </Button>
+                            }
+                            {this.state.isPlaying === true &&
+                                <Button variant="secondary" onClick={() => this.stopTimeline()}>
+                                    <PauseIcon></PauseIcon>
+                                </Button>
+                            }
                             <DateSeekbar dateValue={seekbarControllerValue} emitDate={this.getCurrentDateFromSeekbar} />
-                            <div style={{display: 'flex', justifyContent: 'center'}}>{utcString}</div>
                         </div>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>{utcString}</div>
                     </Col>
-                    <Col xs={3}> Patient Information:
-                {currentPatient &&
+                    <Col xs={3} style={{ alignSelf: 'center' }}> Patient Information:
+                        {currentPatient &&
                             <PatientInfo currentPatient={currentPatient} />
                         }
                     </Col>

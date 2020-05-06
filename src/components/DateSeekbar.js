@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 
 class DateSeekbar extends Component {
@@ -27,7 +26,6 @@ class DateSeekbar extends Component {
         const { dateValue } = this.props;
 
         return <div ref={wrapper}>
-            <Typography gutterBottom>Timeline</Typography>
             <Slider
                 aria-label="custom thumb label"
                 value={dateValue}

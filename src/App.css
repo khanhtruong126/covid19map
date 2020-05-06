@@ -1,3 +1,11 @@
+html, body {
+  height: 100%;
+}
+
+.leaflet-container{
+  height: 520px;
+}
+
 ul{
   list-style-type: none;
 }
@@ -21,7 +29,27 @@ ul{
 }
 
 #dateSeekBar{
-  margin-top: 20px;
+  margin: 20px 0 0 0;
+  
+}
+
+#dateSeekBar > button + div{
+  width: 664px;
+  padding-left: 10px;
+}
+
+#dateSeekBar span.MuiSlider-thumb.MuiSlider-thumbColorPrimary{
+  height: 18px !important;
+  width: 18px !important;
+}
+
+span.MuiSlider-rail, span.MuiSlider-track {
+  height: 8px !important;
+}
+
+span.MuiSlider-root{
+  padding-top: 16px !important;
+  color: 	#808080;
 }
 
 a {
@@ -32,11 +60,12 @@ a {
   font-weight: 500;
 }
 
-span.MuiSlider-rail, span.MuiSlider-track {
-  height: 5px !important;
-}
+h3.chartTitle{
+  justify-content: center;
+  display: flex;
+  color: #555f61;
+} 
 
-#dateSeekBar span.MuiSlider-thumb.MuiSlider-thumbColorPrimary{
-  height: 15px !important;
-  width: 15px !important;
+.container-fluid{
+  padding: 20px 15px;
 }
