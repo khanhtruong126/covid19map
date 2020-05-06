@@ -4,11 +4,6 @@ import axios from 'axios'
 class Stats extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            VietnamStat: [],
-            worldStat: []
-        }
     }
 
     componentDidMount() {
@@ -21,10 +16,6 @@ class Stats extends Component {
             .get('https://td.fpt.ai/corona/corona-chart-vn.json')
             .then(res => {
                 if (res.status === 200) {
-                    this.setState({
-                        VietnamStat: res.data,
-                    });
-
                     const labels = [];
                     const infection = [];
                     const suspectedInfection = [];
